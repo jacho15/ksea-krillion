@@ -131,7 +131,7 @@ export default function Page() {
 
       {inPlay && <Hud depth={depth} score={points(answered)} index={idx} total={PROMPTS.length} colors={colors} />}
 
-      {phase === "question" && count === 0 && <QuestionBar key={idx} onSubmit={submit} />}
+      {phase === "question" && count === 0 && <QuestionBar key={idx} promptIndex={idx} onSubmit={submit} />}
       {phase === "question" && count > 0 && <p className="pill">descending · the clock starts in {count}</p>}
 
       {diving && cur && (

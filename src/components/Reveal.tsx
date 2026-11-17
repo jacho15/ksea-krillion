@@ -18,7 +18,7 @@ export function Reveal({
 }) {
   const miss = !result.tier;
   const gold = result.krillion;
-  const title = miss ? "NOT ON THE LIST" : result.tier;
+  const title = miss ? "OUT OF TIME" : result.tier;
   const titleColor = gold ? TIER_COLORS[result.tier] : miss ? MISS_TEXT : MUTED;
 
   return (

@@ -111,7 +111,14 @@ button { font-family: inherit; cursor: pointer; }
 .ring-bg { stroke: #16304d; }
 .ring-fg { fill: none !important; stroke: var(--cyan); transition: stroke-dashoffset .1s linear; }
 .ring span { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--press); font-size: 13px; color: var(--cyan); }
-.field { flex: 1; max-width: 450px; }
+.field { position: relative; flex: 1; max-width: 450px; }
+.hint { position: absolute; left: 50%; bottom: calc(100% + 16px); transform: translateX(-50%); width: max-content; max-width: min(92vw, 400px); text-align: center; letter-spacing: .08em; color: #7b8ea8; pointer-events: none; }
+.hint p { font-size: 20px; line-height: 1.1; }
+.hint small { display: block; margin-top: 3px; font-size: 15px; letter-spacing: .1em; color: #5f7690; }
+.hint-old { color: #7b8ea8; }
+.hint b { color: var(--cyan); font-weight: 700; text-shadow: 0 0 6px rgba(63, 224, 255, .5); }
+.hint--bad p { color: #f2a23f; }
+.shake { animation: shake .35s; }
 .field input { width: 100%; height: 54px; padding: 0 14px; background: rgba(8, 20, 40, .9); border: 2px solid #2a8fa8; color: #fff; font-family: var(--vt); font-size: 24px; outline: none; }
 .field input:focus { border-color: var(--cyan); box-shadow: 0 0 10px rgba(63, 224, 255, .35); }
 .field input::placeholder { color: #5f7690; }
@@ -172,6 +179,7 @@ button { font-family: inherit; cursor: pointer; }
 @keyframes glow { 50% { filter: brightness(1.35); } }
 @keyframes fadein { from { opacity: 0; } }
 @keyframes pop { from { opacity: 0; transform: scale(.85); } }
+@keyframes shake { 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
 @keyframes slideup { from { opacity: 0; transform: translateY(24px); } }
 @keyframes burst { 0% { opacity: 1; transform: translate(0, 0) scale(.4); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1) rotate(40deg); } }
 @keyframes tierflash { 0%, 40% { border-top-color: var(--tc); filter: drop-shadow(0 0 6px var(--tc)); } 100% { filter: none; } }
@@ -189,6 +197,7 @@ button { font-family: inherit; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   .fish, .bubbles i, .cloud, .wave, .boat, .shrimp, .particles i, .begin, .answer--krill .chip { animation: none; }
   .flash, .burst, .halo { display: none; }
+  .shake { animation: none; }
   .tier--hit { animation: none; }
   .fish { left: var(--x); }
   .world--smooth { transition-duration: .01s; }

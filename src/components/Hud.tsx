@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { depthPx } from "@/lib/game";
+import { check, depthPx } from "@/lib/game";
 
 const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
 
@@ -61,12 +61,15 @@ export function PromptCard({ index, total, text, depth }: { index: number; total
 
 const SECONDS = 25;
 
-export function QuestionBar({ onSubmit }: { onSubmit: (answer: string) => void }) {
+export function QuestionBar({ promptIndex, onSubmit }: { promptIndex: number; onSubmit: (answer: string) => void }) {
   const [end] = useState(() => Date.now() + SECONDS * 1000);
   const [left, setLeft] = useState(SECONDS * 1000);
   const [value, setValue] = useState("");
   const input = useRef<HTMLInputElement>(null);
   const sent = useRef(false);
+  const [hint, setHint] = useState<{ typed: string; fixed: string } | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [shake, setShake] = useState(false);
 
   const send = (answer: string) => {
     if (sent.current) return;
@@ -78,6 +81,28 @@ export function QuestionBar({ onSubmit }: { onSubmit: (answer: string) => void }
     // only auto-focus where there is no on-screen keyboard to pop up
     if (window.matchMedia("(pointer: fine)").matches) input.current?.focus();
   }, []);
+
+  useEffect(() => {
+    if (!msg) return;
+    const id = setTimeout(() => setMsg(null), 4000);
+    return () => clearTimeout(id);
+  }, [msg]);
+
+  const submitValue = () => {
+    const typed = value.trim();
+    if (!typed) return;
+    const c = check(promptIndex, typed);
+    if (c.kind === "hit") return send(typed);
+    if (c.kind === "suggest") {
+      setValue(c.label);
+      setHint({ typed, fixed: c.label });
+      setMsg(null);
+      return;
+    }
+    setHint(null);
+    setMsg(`"${typed}": no echo. try again`);
+    setShake(true);
+  };
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -102,7 +127,7 @@ export function QuestionBar({ onSubmit }: { onSubmit: (answer: string) => void }
       className="bar"
       onSubmit={(e) => {
         e.preventDefault();
-        send(value);
+        submitValue();
       }}
     >
       <div className="ring" role="timer" aria-label="seconds left">
@@ -112,11 +137,29 @@ export function QuestionBar({ onSubmit }: { onSubmit: (answer: string) => void }
         </svg>
         <span>{Math.ceil(left / 1000)}</span>
       </div>
-      <div className="field">
+      <div className={`field${shake ? " shake" : ""}`} onAnimationEnd={() => setShake(false)}>
+        {(hint || msg) && (
+          <div className={`hint${msg ? " hint--bad" : ""}`} role="status">
+            {hint ? (
+              <>
+                <p>
+                  <span className="hint-old">“{hint.typed}”</span> → <b>“{hint.fixed}”</b>
+                </p>
+                <small>submit again to confirm · or edit</small>
+              </>
+            ) : (
+              <p>{msg}</p>
+            )}
+          </div>
+        )}
         <input
           ref={input}
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => {
+            setValue(e.target.value);
+            setHint(null);
+            setMsg(null);
+          }}
           placeholder="type one answer…"
           maxLength={60}
           autoComplete="off"
