@@ -6,7 +6,7 @@ export function Results({ score, depth, onReset }: { score: number; depth: numbe
       <p className="results-title">RESULTS</p>
       <div className="results-score">
         <b>{score.toLocaleString("en-US")}</b>
-        <span>-{depth.toLocaleString("en-US")}m</span>
+        <span>{depth ? `-${depth.toLocaleString("en-US")}` : "0"}m</span>
       </div>
 
       {/* POSTER PLACEHOLDER: drop the ad poster image here (set POSTER_SRC in src/lib/game.ts) */}

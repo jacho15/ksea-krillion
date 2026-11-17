@@ -1,12 +1,25 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { depthPx } from "@/lib/game";
 
 const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
 
-export function Hud({ depth, score, index, total }: { depth: number; score: number; index: number; total: number }) {
+export function Hud({
+  depth,
+  score,
+  index,
+  total,
+  colors,
+}: {
+  depth: number;
+  score: number;
+  index: number;
+  total: number;
+  colors: string[]; // tier colour of each answered prompt
+}) {
   return (
-    <header className="hud">
+    <header className="hud" style={{ opacity: 1 - Math.min(0.4, depth / 2500) }}>
       <div className="panel">
         <small>DEPTH</small>
         <b className="cyan">{fmt(depth)}m</b>
@@ -14,7 +27,11 @@ export function Hud({ depth, score, index, total }: { depth: number; score: numb
       <div className="steps">
         <div>
           {Array.from({ length: total }, (_, i) => (
-            <i key={i} className={i === index ? "on" : i < index ? "done" : ""} />
+            <i
+              key={i}
+              className={i === colors.length && i === index ? "on" : ""}
+              style={i < colors.length ? { background: colors[i], borderColor: colors[i] } : undefined}
+            />
           ))}
         </div>
         <small>
@@ -29,9 +46,10 @@ export function Hud({ depth, score, index, total }: { depth: number; score: numb
   );
 }
 
-export function PromptCard({ index, total, text }: { index: number; total: number; text: string }) {
+export function PromptCard({ index, total, text, depth }: { index: number; total: number; text: string; depth: number }) {
+  const style: CSSProperties = { top: `calc(var(--water) + ${depthPx(depth)}px)` };
   return (
-    <section className="card">
+    <section className="card" style={style}>
       <p className="card-label">
         PROMPT {index + 1} OF {total}
       </p>

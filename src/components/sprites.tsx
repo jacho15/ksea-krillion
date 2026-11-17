@@ -62,6 +62,59 @@ export const CLOUD: Sprite = {
   ],
 };
 
+export const GOLD_SHRIMP: Sprite = {
+  colors: { r: "#e0952a", R: "#f2b84b", a: "#ffe08a", e: "#ffffff", d: "#9a5c10" },
+  grid: SHRIMP.grid,
+};
+
+export const BUBBLE: Sprite = {
+  colors: { c: "#8da2ba" },
+  grid: ["..ccc..", ".c...c.", "c.....c", "c.....c", "c.....c", ".c...c.", "..ccc.."],
+};
+
+export const BUBBLE_CLUSTER: Sprite = {
+  colors: { c: "#9fe6f5" },
+  grid: [
+    "...........ccc..",
+    "..........c...c.",
+    "..........c...c.",
+    "..........c...c.",
+    "...ccc.....ccc..",
+    ".cc...cc........",
+    ".c.....c........",
+    "c.......c..ccc..",
+    "c.......c..c.c..",
+    "c.......c..ccc..",
+    ".c.....c........",
+    ".cc...cc........",
+    "...ccc..........",
+  ],
+};
+
+export const KELP: Sprite = {
+  colors: { k: "#020a16" },
+  grid: [
+    "..k....", ".kk....", ".kk....", "..kk...", "..kk...", "...kk..", "...kk..", "..kk...",
+    "..kk...", ".kk....", ".kk....", "..kk...", "..kk...", "...kk..", ".kkkk..", "kkkkkk.",
+  ],
+};
+
+export const CORAL: Sprite = {
+  colors: { k: "#020a16" },
+  grid: [
+    "k....k...k..",
+    "k....k...k..",
+    "kk..kkk..kk.",
+    ".kk.kkk.kk..",
+    ".kkkkkkkkk..",
+    "..kkkkkkk...",
+    "...kkkkk....",
+    "....kkk.....",
+    "....kkk.....",
+    "...kkkkk....",
+  ],
+};
+
 export function Pixels({
   sprite,
   scale,

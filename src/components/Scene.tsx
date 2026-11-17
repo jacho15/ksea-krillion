@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { CAPTIONS, TIER_LINES, depthPx } from "@/lib/game";
-import { BOAT, CLOUD, FISH, Pixels, SHRIMP } from "./sprites";
+import { CAPTIONS, TIER_COLORS, TIER_LINES, depthPx } from "@/lib/game";
+import { BOAT, CLOUD, CORAL, FISH, KELP, Pixels, SHRIMP } from "./sprites";
 
 // tiny deterministic generator so server and client render the same scene
 function rng(seed: number) {
@@ -8,8 +8,8 @@ function rng(seed: number) {
   return () => (s = (s * 16807) % 2147483647) / 2147483647;
 }
 const rand = rng(42);
-const FISHES = Array.from({ length: 22 }, (_, i) => ({
-  y: 90 + i * 62 + rand() * 40,
+const FISHES = Array.from({ length: 48 }, (_, i) => ({
+  y: 90 + i * 90 + rand() * 50,
   x: Math.round(rand() * 90),
   dur: 22 + rand() * 30,
   delay: -rand() * 40,
@@ -33,15 +33,21 @@ const CLOUDS = [
   { left: 80, top: 4, scale: 5, dur: 80 },
   { left: 62, top: 22, scale: 3, dur: 60 },
 ];
-const TICKS = [0, 100, 200, 500, 1000, 2000, 3000, 4000];
+const TICKS = Array.from({ length: 23 }, (_, i) => i * 100);
+// dark silhouettes along the edges that show up deeper down
+const PLANTS = Array.from({ length: 13 }, (_, i) => ({
+  m: 300 + i * 150,
+  right: i % 2 === 1,
+  coral: i % 3 === 2,
+}));
 
 // water colour by depth (metres): surface blue down to near black
 const STOPS: [number, number[]][] = [
   [0, [27, 91, 136]],
-  [150, [16, 64, 106]],
-  [800, [8, 32, 64]],
-  [2000, [4, 16, 36]],
-  [4000, [2, 7, 16]],
+  [200, [16, 64, 106]],
+  [600, [8, 32, 64]],
+  [1200, [4, 16, 36]],
+  [2200, [2, 7, 16]],
 ];
 function waterColor(d: number) {
   let i = 1;
@@ -58,12 +64,18 @@ export type SceneMode = "start" | "play" | "results";
 
 export function Scene({
   depth,
+  base,
+  answerDepth,
+  showLines,
   mode,
   diving,
   reveal,
   children,
 }: {
   depth: number; // metres; drives colour and (in play) the camera
+  base: number; // metres where the current prompt started (tier lines hang off it)
+  answerDepth: number; // metres the current answer sinks; 0 if none
+  showLines: boolean;
   mode: SceneMode;
   diving: boolean;
   reveal: boolean;
@@ -78,7 +90,7 @@ export function Scene({
   return (
     <div
       className={`scene${diving ? " scene--diving" : ""}${reveal ? " scene--reveal" : ""}`}
-      style={{ background: water, ["--water-color" as string]: water }}
+      style={{ background: water, ["--water-color" as string]: water, ["--lead" as string]: `${lead}vh` }}
     >
       <div
         className={`world${diving ? "" : " world--smooth"}`}
@@ -117,17 +129,21 @@ export function Scene({
         ))}
 
         <div className={`depth-stuff${play ? " depth-stuff--on" : ""}`}>
-          {TIER_LINES.map((t) => (
-            <div
-              key={t.name}
-              className={`tier${t.depth > 3000 ? " tier--top" : ""}`}
-              style={{ top: `calc(var(--water) + ${depthPx(t.depth)}px)` }}
-            >
-              <span>
-                {t.name} · {t.points}
-              </span>
-            </div>
-          ))}
+          {TIER_LINES.map((t) => {
+            const reached = showLines && depth >= base + t.depth - 0.5;
+            const keep = reached && t.depth === answerDepth;
+            return (
+              <div
+                key={t.name}
+                className={`tier${reached ? " tier--hit" : ""}${keep ? " tier--keep" : ""}`}
+                style={{ top: `calc(var(--water) + ${depthPx(base + t.depth)}px)`, ["--tc" as string]: TIER_COLORS[t.name] }}
+              >
+                <span>
+                  {t.name} · {t.points}
+                </span>
+              </div>
+            );
+          })}
           {CAPTIONS.map((c) => (
             <div
               key={c.text}
@@ -146,9 +162,23 @@ export function Scene({
           </div>
         </div>
 
+        {PLANTS.map((p) => (
+          <Pixels
+            key={p.m}
+            sprite={p.coral ? CORAL : KELP}
+            scale={6}
+            className={`plant${p.right ? " plant--right" : ""}`}
+            style={{ top: `calc(var(--water) + ${depthPx(p.m)}px)` }}
+          />
+        ))}
+
         {children}
       </div>
 
+      <div className="dither" style={{ opacity: Math.min(0.55, (depth / 1200) * 0.55) }} />
+      <div className={`you${play ? " you--on" : ""}`}>
+        <span>YOU</span>▶
+      </div>
       <div className="particles" aria-hidden>
         {DOTS.map((d, i) => (
           <i
