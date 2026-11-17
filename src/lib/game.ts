@@ -48,7 +48,7 @@ export const TIER_LINES = [
   { name: "PLANKTON", points: 10, depth: 100 },
   { name: "TOO CLEVER", points: 15, depth: 150 },
   { name: "SCHOOLER", points: 30, depth: 300 },
-  { name: "DEEP CUT", points: 60, depth: 600 },
+  { name: "DEEP CUT", points: 85, depth: 850 },
   { name: TOP_TIER, points: 100, depth: 1000 },
 ];
 
